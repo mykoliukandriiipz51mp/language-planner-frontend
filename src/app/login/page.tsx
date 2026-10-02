@@ -6,6 +6,7 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import { FormikInput } from "@/components/ui/FormikInput";
 import { Button } from "@/components/ui/Button";
+import { BackBtn } from "@/components/ui/BackBtn";
 
 // 1. Схема валідації для форми авторизації
 const loginSchema = Yup.object().shape({
@@ -48,34 +49,14 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen w-full bg-[#E8ECEF] flex flex-col justify-between p-6 md:p-10 relative">
       {/* Кнопка "Back" у лівому верхньому кутку */}
-      <div className="w-full max-w-7xl mx-auto">
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 font-bold text-slate-800 hover:text-indigo-600 transition-colors font-['Encode_Sans_Expanded',_sans-serif]"
-        >
-          <svg
-            className="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2.5}
-              d="M10 19l-7-7m0 0l7-7m-7 7h18"
-            />
-          </svg>
-          <span>Back</span>
-        </Link>
-      </div>
+      <BackBtn link="/" />
 
       {/* Центральна біла картка авторизації */}
       <div className="flex-1 flex items-center justify-center py-6">
-        <div className="bg-white rounded-[32px] shadow-xl border border-slate-100 p-8 md:p-10 w-full max-w-[440px] flex flex-col items-center text-center">
+        <div className="bg-white rounded-[32px] shadow-xl border border-slate-100 p-8 md:p-10 w-full max-w-[620px] flex flex-col items-center text-center">
           {/* Заголовок Login */}
           <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mb-8 font-['Encode_Sans_Expanded',_sans-serif]">
-            Login
+            Увійти
           </h1>
 
           {/* Форма з використанням Formik */}
@@ -93,7 +74,7 @@ export default function LoginPage() {
                 <FormikInput
                   name="email"
                   type="email"
-                  label="Email"
+                  label="Емейл"
                   placeholder="your.email@mail.com"
                 />
 
@@ -102,7 +83,7 @@ export default function LoginPage() {
                   <FormikInput
                     name="password"
                     type="password"
-                    label="Password"
+                    label="Пароль"
                     placeholder="Password"
                   />
                   {/* Посилання Forgot password? */}
@@ -111,7 +92,7 @@ export default function LoginPage() {
                       href="/forgot-password"
                       className="text-xs font-semibold text-indigo-500 hover:text-indigo-600 hover:underline transition-colors"
                     >
-                      Forgot password?
+                      Забув пароль?
                     </Link>
                   </div>
                 </div>
@@ -124,12 +105,12 @@ export default function LoginPage() {
                   disabled={isSubmitting}
                   className="mt-2 bg-[#5046E5] hover:bg-[#4338CA] py-3.5"
                 >
-                  Sign In
+                  Увійти
                 </Button>
 
                 {/* Розділювач "or" */}
                 <div className="my-1 text-xs text-slate-400 font-medium">
-                  or
+                  або
                 </div>
 
                 {/* Кнопка Sign In with Google */}
@@ -142,17 +123,17 @@ export default function LoginPage() {
                   onClick={handleGoogleSignIn}
                   className="py-3.5 border-slate-300 font-bold text-slate-800"
                 >
-                  Sign In with Google
+                  Увійти за допомогою Google
                 </Button>
 
                 {/* Футер-посилання для реєстрації */}
                 <p className="text-xs text-slate-600 font-medium mt-4">
-                  Don’t have an account?{" "}
+                  Ще не маєш профілю?{" "}
                   <Link
                     href="/register"
                     className="font-bold text-indigo-500 hover:text-indigo-600 hover:underline transition-colors"
                   >
-                    Sign Up
+                    Зареєструватись
                   </Link>
                 </p>
               </Form>
