@@ -1,16 +1,16 @@
 "use client";
 
 import React, { useState, useMemo } from "react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Clock } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 // Пресети часу в хвилинах
 const TIME_PRESETS = [
-  { value: 15, label: "15 min" },
-  { value: 30, label: "30 min" },
-  { value: 45, label: "45 min" },
-  { value: 60, label: "60 min" },
-  { value: 90, label: "90 min" },
+  { value: 15, label: "15 хв" },
+  { value: 30, label: "30 хв" },
+  { value: 45, label: "45 хв" },
+  { value: 60, label: "60 хв" },
+  { value: 90, label: "90 хв" },
 ];
 
 export interface DailyTimeBudgetSelection {
@@ -21,14 +21,17 @@ export interface DailyTimeBudgetSelection {
 interface Step7DailyTimeBudgetProps {
   selectedLanguagesCount?: number;
   selectedLanguageNames?: string[];
+  hasDeadlineLanguage?: boolean; // Чи є принаймні одна мова з конкретним дедлайном
   onNext: (data: DailyTimeBudgetSelection) => void;
   onBack?: () => void;
   initialMinutes?: number;
+  data?: any;
 }
 
 export default function Step7DailyTimeBudget({
   selectedLanguagesCount = 3,
-  selectedLanguageNames = ["English", "German", "Spanish"],
+  selectedLanguageNames = ["Англійська", "Німецька", "Іспанська"],
+  hasDeadlineLanguage = true,
   onNext,
   onBack,
   initialMinutes = 60,
@@ -37,12 +40,12 @@ export default function Step7DailyTimeBudget({
   const [selectedMinutes, setSelectedMinutes] =
     useState<number>(initialMinutes);
   const [isCustomMode, setIsCustomMode] = useState<boolean>(
-    !TIME_PRESETS.some((p) => p.value === initialMinutes),
+    !TIME_PRESETS.some((p) => p.value === initialMinutes)
   );
   const [customValue, setCustomValue] = useState<string>(
     !TIME_PRESETS.some((p) => p.value === initialMinutes)
       ? String(initialMinutes)
-      : "",
+      : ""
   );
 
   // Обробка вибору пресету
@@ -63,36 +66,47 @@ export default function Step7DailyTimeBudget({
     }
   };
 
-  // Аналіз достатності часу на основі кількості обраних мов
+  // Розрахунок достатності часу (Евристична валідація розкладу)
   const validationStatus = useMemo(() => {
-    const minRecommendedPerLang = 15; // Мінімальний орієнтир 15 хв на мову
-    const totalRecommended = selectedLanguagesCount * minRecommendedPerLang;
+    const minMaintenancePerLang = 10; // Мін. 10 хв на мову для режимів підтримки
+    const focusMinMinutes = hasDeadlineLanguage ? 40 : 20; // Мін. 40 хв на мову з дедлайном
 
-    const isInsufficient = selectedMinutes < totalRecommended;
+    // Мін. необхідний час = (1 фокусна мова) + (решта мов * 10 хв)
+    const minRequired =
+      selectedLanguagesCount > 1
+        ? focusMinMinutes + (selectedLanguagesCount - 1) * minMaintenancePerLang
+        : focusMinMinutes;
+
+    const isInsufficient = selectedMinutes < minRequired;
 
     return {
       isInsufficient,
-      recommendedMinutes: totalRecommended,
+      minRequired,
+      maintenanceMins: minMaintenancePerLang,
+      focusMins: focusMinMinutes,
       formattedLangList: selectedLanguageNames.join(", "),
     };
-  }, [selectedMinutes, selectedLanguagesCount, selectedLanguageNames]);
+  }, [selectedMinutes, selectedLanguagesCount, selectedLanguageNames, hasDeadlineLanguage]);
 
   const handleSubmit = () => {
-    // onNext({
-    //   dailyMinutes: selectedMinutes,
-    //   isCustom: isCustomMode,
-    // });
-    onNext(data);
+    if (onNext) {
+      onNext(
+        data || {
+          dailyMinutes: selectedMinutes,
+          isCustom: isCustomMode,
+        }
+      );
+    }
   };
 
   return (
     <div className="flex flex-col w-full">
-      {/* Заголовок та підзаголовок */}
+      {/* Заголовок та підзаголовок українською */}
       <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 font-['Encode_Sans_Expanded',_sans-serif]">
-        How much time can you dedicate per study day?
+        Скільки часу ви можете приділяти у день навчання?
       </h1>
       <p className="text-xs md:text-sm text-slate-400 mb-6 font-medium leading-relaxed">
-        Set your total combined daily time budget.
+        Вкажіть ваш загальний щоденний часовий бюджет для всіх обраних мов.
       </p>
 
       {/* Сітка варіантів вибору часу */}
@@ -115,14 +129,14 @@ export default function Step7DailyTimeBudget({
           );
         })}
 
-        {/* Кнопка / Поле Custom */}
+        {/* Кнопка / Поле "Інше" (Custom) */}
         <div className="relative">
           {isCustomMode ? (
             <input
               type="number"
               min="5"
               max="480"
-              placeholder="Mins"
+              placeholder="хв"
               value={customValue}
               onChange={handleCustomChange}
               autoFocus
@@ -137,56 +151,59 @@ export default function Step7DailyTimeBudget({
               }}
               className="w-full h-full py-3.5 px-4 rounded-xl text-xs font-bold transition-all border border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:bg-slate-50"
             >
-              Custom
+              Своє значення
             </button>
           )}
         </div>
       </div>
 
-      {/* Зелений банер успішної конфігурації */}
-      <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 mb-3 flex items-start gap-2.5">
-        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-        <p className="leading-relaxed font-medium">
-          <span className="font-bold">Great!</span> {selectedMinutes} mins is
-          sufficient to balance your {selectedLanguagesCount} selected languages
-          effectively.
-        </p>
-      </div>
-
-      {/* Помаранчеве застереження при критично малому часі */}
-      {validationStatus.isInsufficient && (
-        <div className="p-3.5 bg-amber-50/80 border border-amber-200/90 rounded-2xl text-xs text-amber-900 mb-6 flex items-start gap-2.5">
+      {/* Динамічні повідомлення валідації часу */}
+      {!validationStatus.isInsufficient ? (
+        /* Зелений банер успішної конфігурації */
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-2xl text-xs text-emerald-800 mb-6 flex items-start gap-2.5">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <p className="leading-relaxed font-medium">
+            <span className="font-bold">Чудово!</span> {selectedMinutes} хв/день
+            достатньо для збалансованого вивчення {selectedLanguagesCount} обраних
+            мов ({validationStatus.formattedLangList}).
+          </p>
+        </div>
+      ) : (
+        /* Помаранчеве застереження про дефіцит часу */
+        <div className="p-3.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl text-xs text-amber-900 mb-6 flex items-start gap-2.5 transition-all">
           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed font-medium">
-            <span className="font-bold">⚠️ Time Warning:</span>{" "}
-            {selectedMinutes} minutes per day is tight for learning{" "}
-            {selectedLanguagesCount} languages simultaneously (
-            {validationStatus.formattedLangList}). We recommend at least{" "}
-            {validationStatus.recommendedMinutes} minutes, or setting 2
-            languages to Low Maintenance mode.
+            <span className="font-bold">⚠️ Увага щодо часового бюджету:</span>{" "}
+            Обраного часу ({selectedMinutes} хв/день) недостатньо для якісного
+            вивчення {selectedLanguagesCount} мов одночасно. Щоб підтримувати
+            мовні навички, потрібно мінімум 10 хв на мову, а для мови з чітким
+            дедлайном необхідно принаймні 40 хв. Для вашого поточного розкладу
+            рекомендований мінімум —{" "}
+            <strong>{validationStatus.minRequired} хвилин на добу</strong>.
           </div>
         </div>
       )}
 
       {/* Навігаційні кнопки */}
-      <div className="flex items-center gap-3 mt-auto pt-4">
+      <div className="flex items-center gap-3 mt-auto pt-2">
         {onBack && (
-          <button
+          <Button
+            variant="primary"
             type="button"
+            fullWidth
             onClick={onBack}
-            className="w-1/3 bg-transparent hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 transition-all text-sm"
           >
-            Back
-          </button>
+            Назад
+          </Button>
         )}
+
         <Button
           variant="primary"
           type="button"
           fullWidth
           onClick={handleSubmit}
-          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold font-['Encode_Sans_Expanded',_sans-serif]"
         >
-          Continue
+          Продовжити
         </Button>
       </div>
     </div>

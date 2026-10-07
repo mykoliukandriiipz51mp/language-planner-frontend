@@ -117,33 +117,10 @@ export default function Step2BirthYear({
             </option>
           ))}
         </select>
-
-        {/* Відображення розрахованого віку та динамічного фідбеку */}
-        <div className="mt-4 flex flex-col items-center gap-1.5">
-          <span className="text-sm font-extrabold text-slate-800">
-            Вам: <span className="text-indigo-600">{calculatedAge}</span>{" "}
-            {getAgePlural(calculatedAge)}
-          </span>
-
-          {/* <div
-            className={`mt-1 px-3 py-1.5 rounded-xl border text-xs font-semibold text-center transition-all ${recommendation.badgeBg}`}
-          >
-            {recommendation.text}
-          </div> */}
-        </div>
       </div>
 
       {/* Навігаційні кнопки */}
       <div className="flex items-center gap-3 mt-6">
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-1/3 bg-transparent hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 transition-all text-sm"
-          >
-            Назад
-          </button>
-        )}
         <Button
           variant="primary"
           type="submit"
@@ -155,15 +132,4 @@ export default function Step2BirthYear({
       </div>
     </form>
   );
-}
-
-// Допоміжна функція для відмінювання слова "рік/роки/років"
-function getAgePlural(age: number): string {
-  const lastDigit = age % 10;
-  const lastTwoDigits = age % 100;
-
-  if (lastTwoDigits >= 11 && lastTwoDigits <= 19) return "років";
-  if (lastDigit === 1) return "рік";
-  if (lastDigit >= 2 && lastDigit <= 4) return "роки";
-  return "років";
 }

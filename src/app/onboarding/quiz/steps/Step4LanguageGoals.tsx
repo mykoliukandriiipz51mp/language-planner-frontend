@@ -1,37 +1,36 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
+import { Sparkles, CheckCircle2, Clock, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
-// Специфікація рівнів CEFR
+// Специфікація рівнів CEFR з оцінкою накопичувальних годин (FSI/CEFR Model)
 const PROFICIENCY_LEVELS = [
-  { id: "A1", label: "A1 Beginner" },
-  { id: "A2", label: "A2 Elementary" },
-  { id: "B1", label: "B1 Intermediate" },
-  { id: "B2", label: "B2 Upper Int" },
-  { id: "C1", label: "C1 Advanced" },
-  { id: "C2", label: "C2 Mastery" },
+  { id: "A1", label: "A1 Beginner", hours: 100 },
+  { id: "A2", label: "A2 Elementary", hours: 200 },
+  { id: "B1", label: "B1 Intermediate", hours: 400 },
+  { id: "B2", label: "B2 Upper Int", hours: 700 },
+  { id: "C1", label: "C1 Advanced", hours: 1000 },
+  { id: "C2", label: "C2 Mastery", hours: 1400 },
 ];
 
-// Типові цілі
 const GOAL_OPTIONS = [
-  { id: "career", label: "Career & Work", icon: "💼" },
-  { id: "exam", label: "Exam Prep (IELTS/DELE)", icon: "🎓" },
-  { id: "travel", label: "Travel", icon: "✈️" },
-  { id: "academic", label: "Academic Research", icon: "📚" },
-  { id: "casual", label: "Casual Conversation", icon: "🗣️" },
+  { id: "career", label: "Кар'єра та робота", icon: "💼" },
+  { id: "exam", label: "Підготовка до екзаменів", icon: "🎓" },
+  { id: "travel", label: "Подорожі", icon: "✈️" },
+  { id: "academic", label: "Академічні дослідження", icon: "📚" },
+  { id: "casual", label: "Невимушена розмова", icon: "🗣️" },
 ];
 
-// Мапа мов для відображення прапорів та назв
 const LANGUAGE_MAP: Record<string, { name: string; flag: string }> = {
-  en: { name: "English", flag: "🇬🇧" },
-  es: { name: "Spanish", flag: "🇪🇸" },
-  de: { name: "German", flag: "🇩🇪" },
-  fr: { name: "French", flag: "🇫🇷" },
-  it: { name: "Italian", flag: "🇮🇹" },
-  pt: { name: "Portuguese", flag: "🇵🇹" },
-  pl: { name: "Polish", flag: "🇵🇱" },
-  uk: { name: "Ukrainian", flag: "🇺🇦" },
+  en: { name: "Англійська", flag: "🇬🇧" },
+  es: { name: "Іспанська", flag: "🇪🇸" },
+  de: { name: "Німецька", flag: "🇩🇪" },
+  fr: { name: "Французька", flag: "🇫🇷" },
+  it: { name: "Італійська", flag: "🇮🇹" },
+  pt: { name: "Португальська", flag: "🇵🇹" },
+  pl: { name: "Польська", flag: "🇵🇱" },
+  uk: { name: "Українська", flag: "🇺🇦" },
 };
 
 export interface LanguageGoalData {
@@ -45,9 +44,11 @@ export interface LanguageGoalData {
 }
 
 interface Step4LanguageGoalsProps {
-  languageId: string; // Наприклад, 'en', 'es', 'de'
-  onSave: (data: LanguageGoalData) => void;
+  languageId?: string;
+  onSave?: (data: LanguageGoalData) => void;
   onBack?: () => void;
+  onNext?: (data: any) => void;
+  data?: any;
   isLastLanguage?: boolean;
   initialData?: Partial<LanguageGoalData>;
 }
@@ -63,12 +64,11 @@ export default function Step4LanguageGoals({
 }: Step4LanguageGoalsProps) {
   const langInfo = LANGUAGE_MAP[languageId] || { name: "Language", flag: "🌐" };
 
-  // Локальний стан полів форми
   const [currentLevel, setCurrentLevel] = useState<string>(
     initialData?.currentLevel || "B1",
   );
   const [targetLevel, setTargetLevel] = useState<string>(
-    initialData?.targetLevel || "B1",
+    initialData?.targetLevel || "C2",
   );
   const [primaryGoal, setPrimaryGoal] = useState<string>(
     initialData?.primaryGoal || "exam",
@@ -80,10 +80,10 @@ export default function Step4LanguageGoals({
     "target_date" | "no_deadline"
   >(initialData?.deadlineType || "target_date");
   const [targetDate, setTargetDate] = useState<string>(
-    initialData?.targetDate || "",
+    initialData?.targetDate || "2026-10-18",
   );
 
-  // Автоматичне коригування цільового рівня, якщо він виявиться нижчим за поточний
+  // Коригування рівнів
   useEffect(() => {
     const currentIndex = PROFICIENCY_LEVELS.findIndex(
       (l) => l.id === currentLevel,
@@ -97,53 +97,123 @@ export default function Step4LanguageGoals({
     }
   }, [currentLevel, targetLevel]);
 
-  // Розрахунок рекомендованого рівня залежно від обраної мети
+  // Рекомендація за мети
   const getRecommendation = () => {
     switch (primaryGoal) {
       case "exam":
-        return "Based on your goal (Exam Prep), we recommend reaching B2/C1 to confidently pass.";
+        return "З огляду на вашу мету (підготовка до іспиту), ми рекомендуємо досягти рівня B2/C1, щоб впевнено його скласти.";
       case "career":
-        return "For professional environments, aiming for B2/C1 ensures fluency in business contexts.";
+        return "Для професійного середовища орієнтація на рівні B2/C1 гарантує вільне володіння мовою в ділових ситуаціях.";
       case "academic":
-        return "Academic research typically requires a C1/C2 mastery level for technical comprehension.";
+        return "Академічні дослідження зазвичай вимагають рівня C1/C2 для повного розуміння спеціалізованих матеріалів.";
       case "travel":
-        return "A1/A2 is great for basic interactions, while B1 will unlock comfortable travel communication.";
+        return "Рівні A1/A2 чудово підходять для базового спілкування, тоді як рівень B1 дозволить вільно спілкуватися під час подорожей.";
       case "casual":
-        return "B1/B2 is recommended to hold spontaneous and fluent everyday conversations.";
+        return "Рівень B1/B2 рекомендований для ведення спонтанних і вільних повсякденних розмов.";
       default:
-        return "Set your target level to align with your personal milestones.";
+        return "Встановіть цільовий рівень відповідно до ваших особистих прагнень.";
     }
   };
 
-  // Перевірка придатності форми
+  // Евристичний розрахунок фідбеку щодо дедлайну (Замокаплена бекенд-логіка)
+  const deadlineFeedback = useMemo(() => {
+    // Кейс 1: Без дедлайну
+    if (deadlineType === "no_deadline") {
+      return {
+        type: "no_deadline",
+        bg: "bg-blue-50/80 border-blue-200 text-blue-900",
+        icon: <Sparkles className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />,
+        text: "У нас є весь час світу для досягнення вашої мети! Навчайтеся у власному комфортному темпі без зайвого стресу.",
+      };
+    }
+
+    if (!targetDate) return null;
+
+    // Розрахунок різниці днів та необхідних годин
+    const now = new Date();
+    const selectedDate = new Date(targetDate);
+    const diffTime = selectedDate.getTime() - now.getTime();
+    const diffDays = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+
+    const currObj = PROFICIENCY_LEVELS.find((l) => l.id === currentLevel);
+    const targetObj = PROFICIENCY_LEVELS.find((l) => l.id === targetLevel);
+
+    const neededHours = Math.max(
+      20,
+      (targetObj?.hours || 400) - (currObj?.hours || 100),
+    );
+
+    // Необхідно хвилин на день
+    const requiredDailyMinutes = Math.round((neededHours * 60) / diffDays);
+    const requiredWeeklyMinutes = Math.round((neededHours * 60 * 7) / diffDays);
+    const diffYears = +(diffDays / 365).toFixed(1);
+
+    // Кейс 4: Нереалістичний дедлайн (> 3 годин / 180 хв на день)
+    if (requiredDailyMinutes > 180) {
+      const hoursPerDay = (requiredDailyMinutes / 60).toFixed(1);
+      return {
+        type: "unrealistic",
+        bg: "bg-amber-50/90 border-amber-200/90 text-amber-900",
+        icon: (
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+        ),
+        text: `Це надвиклик! Для досягнення рівня ${targetLevel} до обраної дати вам потрібно буде виділяти ~${hoursPerDay} год/день (${requiredDailyMinutes} хв/день). Ви впевнені, що бажаєте продовжити з обраними цілями?`,
+      };
+    }
+
+    // Кейс 2: Довгий дедлайн (≥ 3 років або ≤ 15 хв/день)
+    if (diffYears >= 3 || requiredDailyMinutes <= 15) {
+      const yearsText = diffYears >= 1 ? `${diffYears} р.` : `${diffDays} днів`;
+      return {
+        type: "long",
+        bg: "bg-emerald-50/80 border-emerald-200 text-emerald-900",
+        icon: (
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+        ),
+        text: `Чудовий запас часу! У нас є ${yearsText} для досягнення нового рівня. Навіть витрачаючи всього ~15 хв на день, ви гарантовано вкладетесь у запланований графік.`,
+      };
+    }
+
+    // Кейс 3: Нормативний/реалістичний дедлайн
+    return {
+      type: "optimal",
+      bg: "bg-[#F5F3FF] border-indigo-100 text-indigo-950",
+      icon: <Clock className="w-4 h-4 text-[#5046E5] shrink-0 mt-0.5" />,
+      text: `Для досягнення рівня ${targetLevel} вам знадобиться витрачати близько ${requiredWeeklyMinutes} хв на тиждень (~${requiredDailyMinutes} хв/день). Це чудовий виклик, який вам точно під силу!`,
+    };
+  }, [deadlineType, targetDate, currentLevel, targetLevel]);
+
   const isTargetValid =
     PROFICIENCY_LEVELS.findIndex((l) => l.id === targetLevel) >=
     PROFICIENCY_LEVELS.findIndex((l) => l.id === currentLevel);
 
   const handleSave = () => {
-    // onSave({
-    //   languageId,
-    //   currentLevel,
-    //   targetLevel,
-    //   primaryGoal,
-    //   customGoal: primaryGoal === "custom" ? customGoal : undefined,
-    //   deadlineType,
-    //   targetDate: deadlineType === "target_date" ? targetDate : undefined,
-    // });
-    onNext(data);
+    if (onSave) {
+      onSave({
+        languageId,
+        currentLevel,
+        targetLevel,
+        primaryGoal,
+        customGoal: primaryGoal === "custom" ? customGoal : undefined,
+        deadlineType,
+        targetDate: deadlineType === "target_date" ? targetDate : undefined,
+      });
+    } else if (onNext) {
+      onNext(data);
+    }
   };
 
   return (
     <div className="flex flex-col w-full">
-      {/* Динамічний заголовок з прапором та назвою мови */}
+      {/* Заголовок */}
       <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-6 font-['Encode_Sans_Expanded',_sans-serif] flex items-center gap-2">
-        Tell us about your {langInfo.flag} {langInfo.name} journey
+        Розкажіть про свої цілі щодо {langInfo.name} {langInfo.flag}
       </h1>
 
-      {/* 1. Поточний рівень володіння */}
+      {/* 1. Поточний рівень */}
       <div className="mb-6">
         <label className="block text-xs font-bold text-slate-800 mb-2.5">
-          What is your current proficiency level?
+          Який ваш поточний рівень володіння?
         </label>
         <div className="grid grid-cols-3 gap-2.5">
           {PROFICIENCY_LEVELS.map((level) => {
@@ -169,7 +239,7 @@ export default function Step4LanguageGoals({
       {/* 2. Основна мета */}
       <div className="mb-6">
         <label className="block text-xs font-bold text-slate-800 mb-2.5">
-          What is your primary goal?
+          Яка ваша основна мета?
         </label>
         <div className="flex flex-wrap gap-2 mb-3">
           {GOAL_OPTIONS.map((goal) => {
@@ -192,10 +262,9 @@ export default function Step4LanguageGoals({
           })}
         </div>
 
-        {/* Поле для кастомної мети */}
         <input
           type="text"
-          placeholder="Or type your custom goal..."
+          placeholder="Або введіть власну ціль..."
           value={customGoal}
           onChange={(e) => {
             setCustomGoal(e.target.value);
@@ -208,7 +277,7 @@ export default function Step4LanguageGoals({
       {/* 3. Цільовий рівень */}
       <div className="mb-5">
         <label className="block text-xs font-bold text-slate-800 mb-2.5">
-          What is your target level?
+          Який ваш цільовий рівень?
         </label>
         <div className="grid grid-cols-3 gap-2.5">
           {PROFICIENCY_LEVELS.map((level, idx) => {
@@ -239,16 +308,16 @@ export default function Step4LanguageGoals({
         </div>
       </div>
 
-      {/* Блок із порадою (Recommendation Banner) */}
+      {/* Блок із порадою */}
       <div className="p-3.5 bg-indigo-50/50 border border-indigo-100 rounded-2xl text-xs text-indigo-900 mb-6 flex items-start gap-2">
         <span className="text-sm">💡</span>
         <p className="leading-relaxed font-medium">{getRecommendation()}</p>
       </div>
 
-      {/* 4. Налаштування дедлайну */}
-      <div className="mb-8">
+      {/* 4. Термін виконання */}
+      <div className="mb-6">
         <label className="block text-xs font-bold text-slate-800 mb-2.5">
-          Deadline preference
+          Бажаний термін виконання
         </label>
         <div className="grid grid-cols-2 gap-3">
           <button
@@ -261,7 +330,7 @@ export default function Step4LanguageGoals({
             }`}
           >
             <span>📅</span>
-            <span>Target Date</span>
+            <span>Цільова дата</span>
           </button>
 
           <button
@@ -274,11 +343,10 @@ export default function Step4LanguageGoals({
             }`}
           >
             <span className="text-sm">∞</span>
-            <span>No deadline</span>
+            <span>Без кінцевої дати</span>
           </button>
         </div>
 
-        {/* Календарний вибір (з'являється при обраному Target Date) */}
         {deadlineType === "target_date" && (
           <div className="mt-3">
             <input
@@ -291,26 +359,32 @@ export default function Step4LanguageGoals({
         )}
       </div>
 
+      {/* ДИНАМІЧНИЙ БЛОК ПІДКАЗКИ ДЕДЛАЙНУ (4 Кейси) */}
+      {deadlineFeedback && (
+        <div
+          className={`p-3.5 rounded-2xl border text-xs mb-6 transition-all flex items-start gap-2.5 ${deadlineFeedback.bg}`}
+        >
+          {deadlineFeedback.icon}
+          <p className="leading-relaxed font-medium">{deadlineFeedback.text}</p>
+        </div>
+      )}
+
       {/* Навігаційні кнопки */}
       <div className="flex items-center gap-3 mt-auto">
-        {onBack && (
-          <button
-            type="button"
-            onClick={onBack}
-            className="w-1/3 bg-transparent hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 transition-all text-sm"
-          >
-            Back
-          </button>
-        )}
+        <Button variant="primary" type="button" fullWidth onClick={onBack}>
+          Назад
+        </Button>
+
         <Button
           variant="primary"
           type="button"
           fullWidth
           onClick={handleSave}
           disabled={!isTargetValid}
-          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold disabled:bg-slate-200 disabled:text-slate-400 font-['Encode_Sans_Expanded',_sans-serif]"
         >
-          {isLastLanguage ? "Save & Continue" : "Save & Next Language"}
+          {isLastLanguage
+            ? "Зберегти і продовжити"
+            : "Зберегти і перейти до наступної мови"}
         </Button>
       </div>
     </div>

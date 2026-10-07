@@ -5,7 +5,12 @@ import { Shuffle, Calendar, Zap, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 
 export type PatternType = "interleaved" | "alternating" | "sprints";
-export type SprintPeriodType = "1_week" | "2_weeks" | "3_weeks" | "1_month" | "custom";
+export type SprintPeriodType =
+  | "1_week"
+  | "2_weeks"
+  | "3_weeks"
+  | "1_month"
+  | "custom";
 
 export interface PatternConfig {
   pattern: PatternType;
@@ -19,8 +24,10 @@ export interface PatternConfig {
 interface Step7SchedulePatternProps {
   dailyMinutes?: number;
   selectedLanguagesCount?: number;
-  onComplete: (config: PatternConfig) => void;
+  onComplete?: (config: PatternConfig) => void;
   onBack?: () => void;
+  onNext?: (data: any) => void;
+  data?: any;
   initialConfig?: Partial<PatternConfig>;
 }
 
@@ -29,9 +36,13 @@ export default function Step7SchedulePattern({
   selectedLanguagesCount = 3,
   onComplete,
   onBack,
+  onNext,
+  data,
   initialConfig,
 }: Step7SchedulePatternProps) {
-  const [pattern, setPattern] = useState<PatternType>(initialConfig?.pattern || "interleaved");
+  const [pattern, setPattern] = useState<PatternType>(
+    initialConfig?.pattern || "interleaved"
+  );
 
   // Стан для Interleaved
   const [maxLangsPerDay, setMaxLangsPerDay] = useState<number>(
@@ -43,7 +54,9 @@ export default function Step7SchedulePattern({
     initialConfig?.sprintPeriod || "1_week"
   );
   const [customSprintDays, setCustomSprintDays] = useState<string>(
-    initialConfig?.customSprintDays ? String(initialConfig.customSprintDays) : "10"
+    initialConfig?.customSprintDays
+      ? String(initialConfig.customSprintDays)
+      : "10"
   );
 
   // Перевірка потенційного когнітивного конфлікту для Interleaved
@@ -51,30 +64,39 @@ export default function Step7SchedulePattern({
     pattern === "interleaved" && dailyMinutes / maxLangsPerDay < 15;
 
   const handleComplete = () => {
-    onComplete({
+    const configPayload: PatternConfig = {
       pattern,
       ...(pattern === "interleaved" && { maxLanguagesPerDay: maxLangsPerDay }),
       ...(pattern === "sprints" && {
         sprintPeriod,
         customSprintDays:
-          sprintPeriod === "custom" ? parseInt(customSprintDays, 10) || 7 : undefined,
+          sprintPeriod === "custom"
+            ? parseInt(customSprintDays, 10) || 7
+            : undefined,
       }),
-    });
+    };
+
+    if (onComplete) {
+      onComplete(configPayload);
+    } else if (onNext) {
+      onNext(data || configPayload);
+    }
   };
 
   return (
     <div className="flex flex-col w-full">
       {/* Заголовок та підзаголовок */}
       <h1 className="text-2xl md:text-3xl font-extrabold text-slate-900 mb-2 font-['Encode_Sans_Expanded',_sans-serif]">
-        Choose your polyglot schedule pattern
+        Оберіть паттерн поліглотного розкладу
       </h1>
       <p className="text-xs md:text-sm text-slate-400 mb-6 font-medium leading-relaxed">
-        Select how tasks are structured across your calendar.
+        Визначте, як саме завдання будуть структуровані у вашому навчальному
+        календарі.
       </p>
 
       {/* Варіанти паттернів */}
       <div className="flex flex-col gap-3.5 mb-6">
-        {/* 1. Interleaved / Mixed Rotation */}
+        {/* 1. Interleaved / Змішана ротація */}
         <div
           onClick={() => setPattern("interleaved")}
           className={`p-4 rounded-2xl border-2 transition-all cursor-pointer select-none ${
@@ -95,10 +117,10 @@ export default function Step7SchedulePattern({
             </div>
             <div className="flex flex-col flex-1">
               <span className="text-sm font-bold text-slate-800">
-                Interleaved / Mixed Rotation
+                Інтерлівінг / Змішана ротація
               </span>
               <span className="text-xs text-slate-400 font-medium leading-relaxed mt-0.5">
-                Study multiple languages on the same day with rest gaps.
+                Вивчення кількох мов впродовж одного дня з короткими перервами.
               </span>
 
               {/* Динамічні налаштування для Interleaved */}
@@ -108,7 +130,7 @@ export default function Step7SchedulePattern({
                   className="mt-3.5 pt-3 border-t border-indigo-100 flex items-center justify-between"
                 >
                   <label className="text-xs font-bold text-slate-700">
-                    Max languages per day:
+                    Макс. мов на день:
                   </label>
                   <div className="flex items-center gap-1.5">
                     {[1, 2, 3, 4, 5].map((num) => {
@@ -157,10 +179,10 @@ export default function Step7SchedulePattern({
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-bold text-slate-800">
-                Alternating Block Days
+                Чергування за днями (Блочний режим)
               </span>
               <span className="text-xs text-slate-400 font-medium leading-relaxed mt-0.5">
-                Mon/Wed = Language A; Tue/Thu = Language B.
+                Пн/Ср — Мова A; Вт/Чт — Мова B (послідовна зміна днів).
               </span>
             </div>
           </div>
@@ -187,10 +209,10 @@ export default function Step7SchedulePattern({
             </div>
             <div className="flex flex-col flex-1">
               <span className="text-sm font-bold text-slate-800">
-                Immersive Focus Sprints
+                Імерсивні фокус-спринти
               </span>
               <span className="text-xs text-slate-400 font-medium leading-relaxed mt-0.5">
-                Rotating primary focus (75% time budget) + maintenance for others.
+                Чергування головної мови (75% часу) + підтримка інших навичок.
               </span>
 
               {/* Динамічні налаштування періоду для Focus Sprints */}
@@ -200,22 +222,24 @@ export default function Step7SchedulePattern({
                   className="mt-3.5 pt-3 border-t border-indigo-100 flex flex-col gap-2"
                 >
                   <label className="text-xs font-bold text-slate-700">
-                    Main language sprint period:
+                    Період спринту для основної мови:
                   </label>
                   <div className="flex flex-wrap items-center gap-1.5">
                     {[
-                      { id: "1_week", label: "1 Week" },
-                      { id: "2_weeks", label: "2 Weeks" },
-                      { id: "3_weeks", label: "3 Weeks" },
-                      { id: "1_month", label: "1 Month" },
-                      { id: "custom", label: "Custom" },
+                      { id: "1_week", label: "1 тиждень" },
+                      { id: "2_weeks", label: "2 тижні" },
+                      { id: "3_weeks", label: "3 тижні" },
+                      { id: "1_month", label: "1 місяць" },
+                      { id: "custom", label: "Свій варіант" },
                     ].map((period) => {
                       const isPeriodSelected = sprintPeriod === period.id;
                       return (
                         <button
                           key={period.id}
                           type="button"
-                          onClick={() => setSprintPeriod(period.id as SprintPeriodType)}
+                          onClick={() =>
+                            setSprintPeriod(period.id as SprintPeriodType)
+                          }
                           className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                             isPeriodSelected
                               ? "bg-[#5046E5] text-white shadow-xs"
@@ -232,7 +256,7 @@ export default function Step7SchedulePattern({
                   {sprintPeriod === "custom" && (
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-xs text-slate-500 font-medium">
-                        Custom duration:
+                        Тривалість:
                       </span>
                       <input
                         type="number"
@@ -242,7 +266,9 @@ export default function Step7SchedulePattern({
                         onChange={(e) => setCustomSprintDays(e.target.value)}
                         className="w-20 px-2.5 py-1 bg-white border border-slate-300 rounded-lg text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500"
                       />
-                      <span className="text-xs text-slate-500 font-medium">days</span>
+                      <span className="text-xs text-slate-500 font-medium">
+                        днів
+                      </span>
                     </div>
                   )}
                 </div>
@@ -252,12 +278,21 @@ export default function Step7SchedulePattern({
         </div>
       </div>
 
-      {/* Попередження про конфлікт завантаження (Schedule Conflict Warning) */}
+      {/* Попередження про конфлікт розкладу (Schedule Conflict Warning) */}
       {isInterleavedConflict && (
         <div className="p-3.5 bg-amber-50/80 border border-amber-200/90 rounded-2xl text-xs text-amber-900 mb-6 flex items-start gap-2.5">
           <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
           <div className="leading-relaxed font-medium">
-            <span className="font-bold">⚠️ Schedule Conflict:</span> The Interleaved strategy with {maxLangsPerDay} languages requires more daily time to avoid cognitive switching overhead. With your {dailyMinutes}-min daily limit, we strongly recommend <span className="font-bold underline cursor-pointer" onClick={() => setPattern("alternating")}>Alternating Block Days</span> instead.
+            <span className="font-bold">⚠️ Конфлікт у розкладі:</span> Стратегія
+            інтерлівінгу з {maxLangsPerDay} мовами вимагає більше щоденного
+            часу, щоб уникнути втрати концентрації при перемиканні. З вашим
+            лімітом у {dailyMinutes} хв/день рекомендуємо обрати{" "}
+            <span
+              className="font-bold underline cursor-pointer"
+              onClick={() => setPattern("alternating")}
+            >
+              Чергування за днями
+            </span>.
           </div>
         </div>
       )}
@@ -265,22 +300,21 @@ export default function Step7SchedulePattern({
       {/* Навігаційні кнопки */}
       <div className="flex items-center gap-3 mt-auto pt-2">
         {onBack && (
-          <button
+          <Button
             type="button"
             onClick={onBack}
-            className="w-1/3 bg-transparent hover:bg-slate-100 text-slate-700 font-bold py-3.5 px-4 rounded-xl border border-slate-200 transition-all text-sm"
           >
-            Back
-          </button>
+            Назад
+          </Button>
         )}
+
         <Button
           variant="primary"
           type="button"
           fullWidth
           onClick={handleComplete}
-          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold font-['Encode_Sans_Expanded',_sans-serif]"
         >
-          Generate My Plan 🚀
+          Згенерувати розклад 🚀
         </Button>
       </div>
     </div>

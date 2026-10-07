@@ -31,7 +31,7 @@ const PROFICIENCY_LEVELS = [
   { value: "NATIVE", label: "Рідна (Native)" },
 ];
 
-export default function OnboardingStep1Page({ onNext, data }) {
+export default function OnboardingStep1Page({ onNext, data, onBack }) {
   const [searchQuery, setSearchQuery] = useState("");
   // Стан для збереження обраних мов та їх рівнів: { "en": "C1", "uk": "NATIVE" }
   const [selectedLanguages, setSelectedLanguages] = useState<
@@ -178,17 +178,26 @@ export default function OnboardingStep1Page({ onNext, data }) {
           );
         })}
       </div>
+      <div className="flex gap-x-[30px]">
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={onBack}
+          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold disabled:bg-slate-200 disabled:text-slate-400"
+        >
+          Назад
+        </Button>
 
-      {/* Кнопка продовження */}
-      <Button
-        variant="primary"
-        fullWidth
-        onClick={onNext}
-        disabled={Object.keys(selectedLanguages).length === 0}
-        className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold disabled:bg-slate-200 disabled:text-slate-400"
-      >
-        Продовжити
-      </Button>
+        <Button
+          variant="primary"
+          fullWidth
+          onClick={onNext}
+          disabled={Object.keys(selectedLanguages).length === 0}
+          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold disabled:bg-slate-200 disabled:text-slate-400"
+        >
+          Продовжити
+        </Button>
+      </div>
     </>
   );
 }
