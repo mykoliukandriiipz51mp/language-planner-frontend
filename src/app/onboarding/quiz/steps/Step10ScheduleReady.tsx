@@ -3,6 +3,7 @@
 import React, { useState, useMemo } from "react";
 import { Award, ChevronLeft, ChevronRight, Settings } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 // Мапа кольорів та бейджів для мов
 const LANGUAGE_BADGES: Record<
@@ -222,15 +223,13 @@ export default function Step10ScheduleReady({
 
       {/* Кнопки дій */}
       <div className="flex flex-col gap-2.5 w-full">
-        <Button
-          variant="primary"
+        <Link
           type="button"
-          fullWidth
-          onClick={onGoToDashboard}
-          className="bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold text-sm font-['Encode_Sans_Expanded',_sans-serif]"
+          href="/dashboard"
+          className="w-full text-white rounded-full text-center bg-[#5046E5] hover:bg-[#4338CA] py-3.5 font-bold text-sm font-['Encode_Sans_Expanded',_sans-serif]"
         >
           Go to Dashboard
-        </Button>
+        </Link>
 
         {onAdjustParameters && (
           <button
