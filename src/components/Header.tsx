@@ -2,8 +2,11 @@
 
 import React from "react";
 import { Flame, Sparkles } from "lucide-react";
+import Link from "next/link";
+import Image from "next/image";
+import ParrotLogo from "@/assets/brand/parrot-mascot.png";
 
-export interface DashboardHeaderProps {
+export interface HeaderProps {
   /** Назва бренду або логотипу */
   brandName?: string;
   /** Кількість днів безперервного навчання (Streak) */
@@ -19,7 +22,7 @@ export interface DashboardHeaderProps {
   onLogout?: () => void;
 }
 
-export default function DashboardHeader({
+export default function Header({
   brandName = "Birbi",
   streakDays = 7,
   userLevel = 28,
@@ -28,14 +31,13 @@ export default function DashboardHeader({
   onNavigateProfile,
   onNavigateSettings,
   onLogout,
-}: DashboardHeaderProps) {
+}: HeaderProps) {
   return (
-    <header className="w-full bg-white rounded-2xl border border-slate-200/80 p-4 mb-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
+    <header className="w-full bg-white rounded-b-2xl border border-slate-200/80 p-4 mb-6 shadow-xs flex flex-wrap items-center justify-between gap-4">
       {/* 1. Логотип та бренд */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 rounded-xl bg-[#5046E5] flex items-center justify-center text-white font-extrabold shadow-md">
-          <Sparkles className="w-5 h-5" />
-        </div>
+        <Image src={ParrotLogo} alt="logo" className="rounded-full w-10 h-10 shadow-md border-3 border-indigo-500" />
+
         <span className="text-xl font-black text-slate-900 tracking-tight font-['Encode_Sans_Expanded',_sans-serif]">
           {brandName}
         </span>
@@ -43,34 +45,24 @@ export default function DashboardHeader({
 
       {/* 2. Навігаційне меню */}
       <nav className="flex items-center gap-6 text-base font-bold text-slate-500">
-        <button
-          type="button"
-          onClick={onNavigateWorkplace}
+        <Link
+          href="/dashboard"
           className="text-[#5046E5] hover:text-[#4338CA] transition-all bg-transparent border-none cursor-pointer"
         >
           Робочий простір
-        </button>
-        <button
-          type="button"
-          onClick={onNavigateProfile}
+        </Link>
+        <Link
+          href="/profile"
           className="hover:text-slate-800 transition-all bg-transparent border-none cursor-pointer"
         >
           Профіль
-        </button>
-        <button
-          type="button"
-          onClick={onNavigateSettings}
+        </Link>
+        <Link
+          href="/settings"
           className="hover:text-slate-800 transition-all bg-transparent border-none cursor-pointer"
         >
           Налаштування
-        </button>
-        <button
-          type="button"
-          onClick={onLogout}
-          className="hover:text-slate-800 transition-all bg-transparent border-none cursor-pointer"
-        >
-          Вийти
-        </button>
+        </Link>
       </nav>
 
       {/* 3. Показники гейміфікації (Стрик та Рівень) */}
@@ -93,6 +85,14 @@ export default function DashboardHeader({
             />
           </div>
         </div>
+
+        <button
+          type="button"
+          onClick={onLogout}
+          className="hover:text-slate-800 transition-all bg-transparent border-none cursor-pointer text-base font-bold text-slate-500"
+        >
+          Вийти
+        </button>
       </div>
     </header>
   );

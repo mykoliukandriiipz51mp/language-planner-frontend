@@ -20,6 +20,7 @@ import {
   Info,
 } from "lucide-react";
 import { Button } from "@/components/ui/Button";
+import Link from "next/link";
 
 export interface CurriculumTask {
   id: string;
@@ -485,12 +486,18 @@ export default function LanguageDetailView({
       <div className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs flex flex-col justify-between">
         <div>
           <div className="flex items-center justify-between mb-2">
-            <h2 className="text-sm font-extrabold text-slate-900 font-['Encode_Sans_Expanded',_sans-serif]">
-              НАВЧАЛЬНА ПРОГРАМА
-            </h2>
-            <span className="text-xs font-extrabold text-[#5046E5]">
-              65% Завершено
-            </span>
+            <h2 className="text-sm font-extrabold text-slate-900 font-['Encode_Sans_Expanded',_sans-serif] flex items-center">
+              НАВЧАЛЬНА ПРОГРАМА &nbsp;
+              <span className="text-xs font-extrabold text-[#5046E5]  ml-4">
+                65% Завершено
+              </span>
+            </h2>{" "}
+            <Link
+              href="/curriculum-hub"
+              className=" text-indigo-500 font-bold text-xs"
+            >
+              (Більше навчальних програм &rarr;)
+            </Link>
           </div>
 
           {/* Прогрес-бар програми */}
@@ -617,48 +624,30 @@ export default function LanguageDetailView({
       </div>
 
       {/* 5. Нижні блоки: Статус ризику інтерференції + Досягнення мови */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-4">
-        {/* Попередження про ризик інтерференції (5 колонок) */}
-        <div className="lg:col-span-6 bg-amber-50/80 border border-amber-200/90 rounded-3xl p-4 flex items-start gap-3">
-          <div className="p-2 bg-amber-500 text-white rounded-xl shrink-0">
-            <AlertTriangle className="w-4 h-4" />
-          </div>
-          <div className="flex flex-col">
-            <span className="text-xs font-black text-amber-900 font-['Encode_Sans_Expanded',_sans-serif]">
-              СТАТУС РИЗИКУ ІНТЕРФЕРЕНЦІЇ: НИЗЬКИЙ
-            </span>
-            <p className="text-xs text-amber-800 font-medium leading-relaxed mt-0.5">
-              Англійська та Іспанська мають мінімальне лексичне накладання. Ви
-              можете безпечно практикувати обидві мови сьогодні без ризику
-              змішування слів.
-            </p>
-          </div>
-        </div>
 
-        {/* Досягнення конкретної мови (7 колонок) */}
-        <div className="lg:col-span-6 bg-white border border-slate-200/80 rounded-3xl p-4 flex flex-col justify-between">
-          <h3 className="text-xs font-extrabold text-slate-900 mb-2 font-['Encode_Sans_Expanded',_sans-serif]">
-            ДОСЯГНЕННЯ МОВИ
-          </h3>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center gap-2">
-              <Award className="w-4 h-4 text-[#5046E5] shrink-0" />
-              <span className="text-[11px] font-bold text-slate-800 line-clamp-1">
-                Майстер слів
-              </span>
-            </div>
-            <div className="p-2 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-2">
-              <Flame className="w-4 h-4 text-amber-500 shrink-0" />
-              <span className="text-[11px] font-bold text-slate-800 line-clamp-1">
-                7 днів поспіль
-              </span>
-            </div>
-            <div className="p-2 bg-slate-100 border border-slate-200 rounded-xl flex items-center gap-2 opacity-60">
-              <BookOpen className="w-4 h-4 text-slate-400 shrink-0" />
-              <span className="text-[11px] font-bold text-slate-600 line-clamp-1">
-                Граматичний ніндзя
-              </span>
-            </div>
+      {/* Досягнення конкретної мови (7 колонок) */}
+      <div className=" bg-white border border-slate-200/80 rounded-3xl p-4 flex flex-col justify-between">
+        <h3 className="text-xs font-extrabold text-slate-900 mb-2 font-['Encode_Sans_Expanded',_sans-serif]">
+          ДОСЯГНЕННЯ МОВИ
+        </h3>
+        <div className="grid grid-cols-3 gap-2">
+          <div className="p-2 bg-indigo-50 border border-indigo-100 rounded-xl flex items-center gap-2">
+            <Award className="w-4 h-4 text-[#5046E5] shrink-0" />
+            <span className="text-[11px] font-bold text-slate-800 line-clamp-1">
+              Майстер слів
+            </span>
+          </div>
+          <div className="p-2 bg-amber-50 border border-amber-100 rounded-xl flex items-center gap-2">
+            <Flame className="w-4 h-4 text-amber-500 shrink-0" />
+            <span className="text-[11px] font-bold text-slate-800 line-clamp-1">
+              7 днів поспіль
+            </span>
+          </div>
+          <div className="p-2 bg-slate-100 border border-slate-200 rounded-xl flex items-center gap-2 opacity-60">
+            <BookOpen className="w-4 h-4 text-slate-400 shrink-0" />
+            <span className="text-[11px] font-bold text-slate-600 line-clamp-1">
+              Граматичний ніндзя
+            </span>
           </div>
         </div>
       </div>

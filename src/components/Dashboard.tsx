@@ -20,8 +20,13 @@ import {
   Check,
 } from "lucide-react";
 import Link from "next/link";
+import Modal from "./ui/ModalWindow";
+import { useState } from "react";
+import Step5LanguagePriorities from "@/app/onboarding/quiz/steps/Step5LanguagePriorities";
 
 export default function Dashboard({ LANGUAGES }) {
+  const [isPrioritiesModalOpen, setIsPrioritiesModalOpen] = useState(false);
+
   return (
     <>
       {/* 3. Привітальний баннер (Welcome Banner) */}
@@ -179,7 +184,10 @@ export default function Dashboard({ LANGUAGES }) {
               <h2 className="text-lg font-extrabold text-slate-900 font-['Encode_Sans_Expanded',_sans-serif]">
                 СЬОГОДНІШНІ ЗАВДАННЯ
               </h2>
-              <Link href="task-manager" className="text-base font-bold text-[#5046E5] hover:underline">
+              <Link
+                href="task-manager"
+                className="text-base font-bold text-[#5046E5] hover:underline"
+              >
                 Переглянути всі завдання
               </Link>
             </div>
@@ -419,7 +427,10 @@ export default function Dashboard({ LANGUAGES }) {
             </div>
           </div>
 
-          <button className="text-base font-bold text-[#5046E5] hover:underline text-left">
+          <button
+            onClick={() => setIsPrioritiesModalOpen(true)}
+            className="text-base font-bold text-[#5046E5] hover:underline text-left"
+          >
             Налаштувати вагові коефіцієнти стратегії ➔
           </button>
         </div>
@@ -524,6 +535,12 @@ export default function Dashboard({ LANGUAGES }) {
           ))}
         </div>
       </section>
+      <Modal
+        isOpen={isPrioritiesModalOpen}
+        onClose={() => setIsPrioritiesModalOpen(false)}
+      >
+        <Step5LanguagePriorities onNext={() => {}} />
+      </Modal>
     </>
   );
 }

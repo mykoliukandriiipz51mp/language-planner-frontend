@@ -112,150 +112,147 @@ export default function CurriculumHubView() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] p-4 md:p-8 font-sans text-slate-800">
-      <Header />
-
-      <main className="max-w-7xl mx-auto flex flex-col gap-6">
-        {/* Шапка секції */}
-        <div className="flex flex-wrap items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-black text-slate-900 tracking-tight font-['Encode_Sans_Expanded',_sans-serif]">
-              НАВЧАЛЬНІ ПЛАНИ ТА ПРОГРАМИ
-            </h1>
-            <p className="text-xs text-slate-400 font-medium">
-              Перемикайтеся між структурованими курсами або створюйте власні
-              плани.
-            </p>
-          </div>
-
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="bg-[#5046E5] hover:bg-[#4338CA] text-white px-5 py-3 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Створити власний навчальний план</span>
-          </button>
+    <>
+      {/* Шапка секції */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight font-['Encode_Sans_Expanded',_sans-serif]">
+            НАВЧАЛЬНІ ПЛАНИ ТА ПРОГРАМИ
+          </h1>
+          <p className="text-xs text-slate-400 font-medium">
+            Перемикайтеся між структурованими курсами або створюйте власні
+            плани.
+          </p>
         </div>
 
-        {/* Картка Активного Плану */}
-        {plans.find((p) => p.isActive) && (
-          <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
-            <div className="lg:col-span-5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white flex flex-col justify-between min-h-[220px]">
-              <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-white/20 backdrop-blur-md rounded-full self-start">
-                Поточний активний план
+        {/* Створення власного курсу (не для mvp) */}
+        {/* <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#5046E5] hover:bg-[#4338CA] text-white px-5 py-3 rounded-2xl text-xs font-bold transition-all shadow-md flex items-center gap-2"
+        >
+          <Plus className="w-4 h-4" />
+          <span>Створити власний навчальний план</span>
+        </button> */}
+      </div>
+
+      {/* Картка Активного Плану */}
+      {plans.find((p) => p.isActive) && (
+        <div className="bg-white border border-slate-200/80 rounded-3xl p-6 shadow-2xs grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+          <div className="lg:col-span-5 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl p-6 text-white flex flex-col justify-between min-h-[220px]">
+            <span className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-white/20 backdrop-blur-md rounded-full self-start">
+              Поточний активний план
+            </span>
+            <div>
+              <span className="text-sm">🇬🇧</span>
+              <h2 className="text-xl font-extrabold mt-1">
+                Англійська для кар'єри та бізнесу
+              </h2>
+              <p className="text-xs text-white/80 mt-1">
+                Прогрес: 62% Завершено (18/29 тем)
+              </p>
+            </div>
+          </div>
+
+          <div className="lg:col-span-7 flex flex-col gap-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <span className="text-xs font-extrabold text-slate-800">
+                Зміст плану (Теми та Завдання)
               </span>
-              <div>
-                <span className="text-sm">🇬🇧</span>
-                <h2 className="text-xl font-extrabold mt-1">
-                  Англійська для кар'єри та бізнесу
-                </h2>
-                <p className="text-xs text-white/80 mt-1">
-                  Прогрес: 62% Завершено (18/29 тем)
-                </p>
-              </div>
+              <button className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
+                <Edit3 className="w-3.5 h-3.5" />
+                <span>Редагувати теми</span>
+              </button>
             </div>
 
-            <div className="lg:col-span-7 flex flex-col gap-3">
-              <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-                <span className="text-xs font-extrabold text-slate-800">
-                  Зміст плану (Теми та Завдання)
+            <div className="flex flex-col gap-2">
+              <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>1. Реєстрація в аеропорту та готелі</span>
+                <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
+                  В процесі
                 </span>
-                <button className="text-xs font-bold text-indigo-600 hover:underline flex items-center gap-1">
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Редагувати теми</span>
-                </button>
               </div>
-
-              <div className="flex flex-col gap-2">
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs font-bold text-slate-700">
-                  <span>1. Реєстрація в аеропорту та готелі</span>
-                  <span className="text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded">
-                    В процесі
-                  </span>
-                </div>
-                <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs font-bold text-slate-700">
-                  <span>2. Переговори та укладання угод</span>
-                  <span className="text-slate-400">До вивчення</span>
-                </div>
+              <div className="p-3 bg-slate-50 rounded-xl flex items-center justify-between text-xs font-bold text-slate-700">
+                <span>2. Переговори та укладання угод</span>
+                <span className="text-slate-400">До вивчення</span>
               </div>
             </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Фільтрація та Сітка Всіх Планів */}
-        <div className="flex flex-col gap-4">
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2 overflow-x-auto">
-              {[
-                "Всі плани",
-                "Мвої власні",
-                "Рекомендовані",
-                "Бізнес",
-                "Подорожі",
-              ].map((cat, i) => (
-                <button
-                  key={i}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                    i === 0
-                      ? "bg-[#5046E5] text-white shadow-xs"
-                      : "bg-white text-slate-600 border border-slate-200"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
-            </div>
-
-            <div className="relative">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Пошук навчальних планів..."
-                className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            {plans.map((plan) => (
-              <div
-                key={plan.id}
-                className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs flex flex-col justify-between gap-4 hover:border-slate-300 transition-all"
+      {/* Фільтрація та Сітка Всіх Планів */}
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-center gap-2 overflow-x-auto">
+            {[
+              "Всі плани",
+              // "Мвої власні",
+              "Рекомендовані",
+              "Бізнес",
+              "Подорожі",
+            ].map((cat, i) => (
+              <button
+                key={i}
+                className={`px-3.5 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  i === 0
+                    ? "bg-[#5046E5] text-white shadow-xs"
+                    : "bg-white text-slate-600 border border-slate-200"
+                }`}
               >
-                <div>
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs">{plan.flag}</span>
-                    <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md uppercase">
-                      {plan.category}
-                    </span>
-                  </div>
-                  <h3 className="text-sm font-extrabold text-slate-900 leading-snug">
-                    {plan.title}
-                  </h3>
-                  <span className="text-[11px] text-slate-400 font-bold block mt-1">
-                    Рівень: {plan.level}
-                  </span>
-                </div>
-
-                <div className="flex items-center justify-between pt-3 border-t border-slate-100">
-                  <span className="text-xs font-bold text-slate-500">
-                    Прогрес: {plan.progress}%
-                  </span>
-                  <button
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      plan.isActive
-                        ? "bg-emerald-100 text-emerald-800"
-                        : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
-                    }`}
-                  >
-                    {plan.isActive ? "Активний" : "Обрати план"}
-                  </button>
-                </div>
-              </div>
+                {cat}
+              </button>
             ))}
           </div>
+
+          <div className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Пошук навчальних планів..."
+              className="pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 focus:outline-none focus:ring-2 focus:ring-indigo-500/20"
+            />
+          </div>
         </div>
-      </main>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+          {plans.map((plan) => (
+            <div
+              key={plan.id}
+              className="bg-white border border-slate-200/80 rounded-3xl p-5 shadow-2xs flex flex-col justify-between gap-4 hover:border-slate-300 transition-all"
+            >
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-xs">{plan.flag}</span>
+                  <span className="text-[10px] font-black px-2 py-0.5 bg-slate-100 text-slate-600 rounded-md uppercase">
+                    {plan.category}
+                  </span>
+                </div>
+                <h3 className="text-sm font-extrabold text-slate-900 leading-snug">
+                  {plan.title}
+                </h3>
+                <span className="text-[11px] text-slate-400 font-bold block mt-1">
+                  Рівень: {plan.level}
+                </span>
+              </div>
+
+              <div className="flex items-center justify-between pt-3 border-t border-slate-100">
+                <span className="text-xs font-bold text-slate-500">
+                  Прогрес: {plan.progress}%
+                </span>
+                <button
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                    plan.isActive
+                      ? "bg-emerald-100 text-emerald-800"
+                      : "bg-indigo-50 text-indigo-600 hover:bg-indigo-100"
+                  }`}
+                >
+                  {plan.isActive ? "Активний" : "Обрати план"}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
 
       {/* МОДАЛЬНЕ ВІКНО: Створення власного плану навчання */}
       {isModalOpen && (
@@ -374,6 +371,6 @@ export default function CurriculumHubView() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }
